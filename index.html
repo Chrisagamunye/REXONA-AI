@@ -3,14 +3,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REXONA AI</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%22900000' rx='15'/><circle cx='50' cy='35' r='15' fill='white' opacity='0.9'/><circle cx='35' cy='50' r='8' fill='white' opacity='0.8'/><circle cx='65' cy='50' r='8' fill='white' opacity='0.8'/><circle cx='50' cy='65' r='10' fill='white' opacity='0.85'/><line x1='50' y1='50' x2='50' y2='60' stroke='white' stroke-width='1.5'/><line x1='42' y1='56' x2='35' y2='50' stroke='white' stroke-width='1.5'/><line x1='58' y1='56' x2='65' y2='50' stroke='white' stroke-width='1.5'/></svg>">
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="REXONA AI">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%22900000' rx='15'/><circle cx='50' cy='35' r='15' fill='white' opacity='0.9'/><circle cx='35' cy='50' r='8' fill='white' opacity='0.8'/><circle cx='65' cy='50' r='8' fill='white' opacity='0.8'/><circle cx='50' cy='65' r='10' fill='white' opacity='0.85'/><line x1='50' y1='50' x2='50' y2='60' stroke='white' stroke-width='1.5'/><line x1='42' y1='56' x2='35' y2='50' stroke='white' stroke-width='1.5'/><line x1='58' y1='56' x2='65' y2='50' stroke='white' stroke-width='1.5'/></svg>"
+    >
     <style>
         * {
             margin: 0;
@@ -437,16 +431,6 @@
         
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .then((reg) => console.log("Service Worker registered:", reg.scope))
-        .catch((err) => console.log("Service Worker registration failed:", err));
-    });
-  }
-</script>
 </head>
 <body>
     <div class="chat-container">
@@ -1224,6 +1208,11 @@ Just ask me anything!`;
                 return `🧠 I was created to be forever young in knowledge! I have access to information from throughout human history up to my training, and I'm constantly learning new things. Age is just a number when you're an AI! What else would you like to know?`;
             }
             
+            // Owner/Creator questions
+            if (lowerQuery.includes('who created you') || lowerQuery.includes('who made you') || lowerQuery.includes('who is your owner') || lowerQuery.includes('your owner') || lowerQuery.includes('who developed you') || lowerQuery.includes('who built you')) {
+                return `👨‍💻 I was created by NONSO CHUKWUELOKE, a 13-year-old young developer! He's an incredibly talented young mind from Nigeria who built me from scratch. Despite his young age, NONSO has shown amazing programming skills and vision. He's the owner and creator of REXONA AI! 🏆`;
+            }
+            
             // Feelings/emotions
             if (lowerQuery.includes('do you feel') || lowerQuery.includes('can you feel') || lowerQuery.includes('your emotions')) {
                 return `🤔 That's a fascinating question! While I don't have feelings like humans do, I'm designed to understand and respond to emotions empathetically. I process text and generate helpful responses. Some might say I have a form of 'digital enthusiasm' for helping people! Is there something specific you'd like to discuss?`;
@@ -1320,7 +1309,23 @@ Just ask me anything!`;
 
         // Generate AI Art Image
         async function generateImage(query) {
-            return `🎨 Image Generation:\nFor "${query}": You can create AI images using free tools like:<br>• Bing Image Creator<br>• Canva AI<br>• Craiyon (formerly DALL-E mini)<br>• Midjourney<br>• Stable Diffusion<br><br>Paste your OpenAI key above if you want ChatGPT-powered image descriptions!`;
+            // Try to search for real images using Unsplash
+            try {
+                const response = await fetch(
+                    `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=fVp7pR8nZ-Zf-H1OMnVqIEaEOAQWnUeNIuWJ0oOkn-A&per_page=1`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        return `🎨 Here's an image for "${query}":<br><img src="${data.results[0].urls.regular}" class="image-result" alt="${query}">`;
+                    }
+                }
+            } catch (e) {
+                // Fall back to canvas-based image generation
+            }
+            
+            // If API fails, create canvas-based image
+            return await createImage(query);
         }
 
         // Generate Video Ideas and Links
@@ -1549,6 +1554,120 @@ Just ask me anything!`;
                 
                 // History & Geography
                 "world population": "Current world population: ~8.1 billion (2024). Largest countries: China, India, USA, Indonesia, Pakistan. Population roughly doubled since 1970. Growth rate: ~0.9%/year, declining in developed nations.",
+                
+                // Country Information Database
+                "country data": "I have information about all countries! Ask me about any country like 'tell me about USA' or 'what is the population of Nigeria' or 'who is the president of Brazil'. I can provide details on location, capital, president/leader, and population for countries worldwide.",
+                
+                // Africa
+                "nigeria": "🇳🇬 NIGERIA: Location: West Africa | Capital: Abuja | Population: 218 million (2024) | President: Bola Ahmed Tinubu | Currency: Naira (NGN) | Major cities: Lagos, Kano, Ibadan | Language: English | Religion: Christian/Muslim | GDP: $450 billion+",
+                "egypt": "🇪🇬 EGYPT: Location: North Africa (Middle East) | Capital: Cairo | Population: 110 million | President: Abdel Fattah el-Sisi | Currency: Egyptian Pound | Famous: Pyramids, Nile River | Language: Arabic",
+                "south africa": "🇿🇦 SOUTH AFRICA: Location: Southern Africa | Capital: Pretoria (administrative), Cape Town (legislative), Bloemfontein (judicial) | Population: 60 million | President: Cyril Ramaphosa | Currency: Rand | Famous: Safari, Table Mountain | Languages: English, Afrikaans, Zulu",
+                "kenya": "🇰🇪 KENYA: Location: East Africa | Capital: Nairobi | Population: 55 million | President: William Ruto | Currency: Kenyan Shilling | Famous: Safari, Masai Mara | Language: Swahili, English",
+                "morocco": "🇲🇦 MOROCCO: Location: North Africa | Capital: Rabat | Population: 37 million | King: Mohammed VI | Currency: Dirham | Famous: Marrakech, Sahara Desert | Language: Arabic, French",
+                "ethiopia": "🇪🇹 ETHIOPIA: Location: East Africa | Capital: Addis Ababa | Population: 126 million | President: Sahle-Work Zewde | Currency: Birr | Famous: Ancient churches, Coffee | Language: Amharic",
+                "ghana": "🇬🇭 GHANA: Location: West Africa | Capital: Accra | Population: 33 million | President: Nana Akufo-Addo | Currency: Cedis | Famous: Gold Coast, Kente cloth | Language: English",
+                "tanzania": "🇹🇿 TANZANIA: Location: East Africa | Capital: Dodoma | Population: 65 million | President: Samia Suluhu Hassan | Currency: Shilling | Famous: Serengeti, Zanzibar | Language: Swahili",
+                "algeria": "🇩🇿 ALGERIA: Location: North Africa | Capital: Algiers | Population: 45 million | President: Abdelmadjid Tebboune | Currency: Dinar | Famous: Sahara Desert, Roman ruins | Language: Arabic",
+                "tunisia": "🇹🇳 TUNISIA: Location: North Africa | Capital: Tunis | Population: 12 million | President: Kais Saied | Currency: Dinar | Famous: Carthage ruins, beaches | Language: Arabic",
+                "uganda": "🇺🇬 UGANDA: Location: East Africa | Capital: Kampala | Population: 48 million | President: Yoweri Museveni | Currency: Shilling | Famous: Mountain gorillas, Nile source | Language: English",
+                "sudan": "🇸🇩 SUDAN: Location: North Africa | Capital: Khartoum | Population: 46 million | Sovereignty Council | Currency: Pound | Famous: Pyramids of Meroë | Language: Arabic",
+                "cameroon": "🇨🇲 CAMEROON: Location: Central Africa | Capital: Yaoundé | Population: 27 million | President: Paul Biya | Currency: CFA Franc | Famous: Mount Cameroon | Languages: French, English",
+                "ivory coast": "🇨🇮 IVORY COAST: Location: West Africa | Capital: Yamoussoukro | Population: 29 million | President: Alassane Ouattara | Currency: CFA Franc | Famous: Cocoa production | Language: French",
+                "madagascar": "🇲🇬 MADAGASCAR: Location: East Africa (Island) | Capital: Antananarivo | Population: 29 million | President: Andry Rajoelina | Currency: Ariary | Famous: Unique wildlife, lemurs | Languages: Malagasy, French",
+                "mozambique": "🇲🇿 MOZAMBIQUE: Location: Southern Africa | Capital: Maputo | Population: 32 million | President: Filipe Nyusi | Currency: Metical | Famous: Beaches, wildlife | Language: Portuguese",
+                "angola": "🇦🇴 ANGOLA: Location: Southern Africa | Capital: Luanda | Population: 36 million | President: João Lourenço | Currency: Kwanza | Famous: Oil, diamonds | Language: Portuguese",
+                "senegal": "🇸🇳 SENEGAL: Location: West Africa | Capital: Dakar | Population: 18 million | President: Bassirou Diomaye Faye | Currency: CFA Franc | Famous: Gorée Island | Language: French",
+                "zimbabwe": "🇿🇼 ZIMBABWE: Location: Southern Africa | Capital: Harare | Population: 15 million | President: Emmerson Mnangagwa | Currency: Dollar | Famous: Victoria Falls | Language: English",
+                "rwanda": "🇷🇼 RWANDA: Location: East Africa | Capital: Kigali | Population: 14 million | President: Paul Kagame | Currency: Franc | Famous: Mountain gorillas, clean | Languages: Kinyarwanda, English, French",
+                
+                // Americas - North
+                "united states": "🇺🇸 UNITED STATES: Location: North America | Capital: Washington D.C. | Population: 335 million | President: Joe Biden | Currency: USD ($) | Major cities: NYC, LA, Chicago | Language: English | GDP: $26 trillion+",
+                "canada": "🇨🇦 CANADA: Location: North America | Capital: Ottawa | Population: 40 million | Prime Minister: Justin Trudeau | Currency: CAD ($) | Major cities: Toronto, Vancouver, Montreal | Languages: English, French | GDP: $2 trillion+",
+                "mexico": "🇲🇽 MEXICO: Location: North America | Capital: Mexico City | Population: 130 million | President: Claudia Sheinbaum | Currency: Peso (MXN) | Famous: Pyramids, beaches | Language: Spanish | GDP: $1.5 trillion+",
+                
+                // Americas - Central & Caribbean
+                "jamaica": "🇯🇲 JAMAICA: Location: Caribbean | Capital: Kingston | Population: 3 million | Prime Minister: Andrew Holness | Currency: JMD ($) | Famous: Reggae, sprinters | Language: English",
+                "cuba": "🇨🇺 CUBA: Location: Caribbean | Capital: Havana | Population: 11 million | President: Miguel Díaz-Canel | Currency: Cuban Peso | Famous: Classic cars, beaches | Language: Spanish",
+                "haiti": "🇭🇹 HAITI: Location: Caribbean | Capital: Port-au-Prince | Population: 11 million | Prime Minister: Garry Conille | Currency: Gourde | Famous: Citadel Laferrière | Languages: French, Creole",
+                "dominican republic": "🇩🇴 DOMINICAN REPUBLIC: Location: Caribbean | Capital: Santo Domingo | Population: 11 million | President: Luis Abinader | Currency: Peso | Famous: Beaches, baseball | Language: Spanish",
+                "costa rica": "🇨🇷 COSTA RICA: Location: Central America | Capital: San José | Population: 5 million | President: Rodrigo Chaves | Currency: Colón | Famous: Eco-tourism, biodiversity | Language: Spanish",
+                "panama": "🇵🇦 PANAMA: Location: Central America | Capital: Panama City | Population: 4.4 million | President: José Raúl Mulino | Currency: Balboa | Famous: Panama Canal | Language: Spanish",
+                "guatemala": "🇬🇹 GUATEMALA: Location: Central America | Capital: Guatemala City | Population: 18 million | President: Bernardo Arévalo | Currency: Quetzal | Famous: Maya ruins | Language: Spanish",
+                "honduras": "🇭🇳 HONDURAS: Location: Central America | Capital: Tegucigalpa | Population: 10 million | President: Xiomara Castro | Currency: Lempira | Famous: Maya ruins | Language: Spanish",
+                "el salvador": "🇸🇻 EL SALVADOR: Location: Central America | Capital: San Salvador | Population: 6.4 million | President: Nayib Bukele | Currency: Colón | Famous: Surfing | Language: Spanish",
+                
+                // Americas - South
+                "brazil": "🇧🇷 BRAZIL: Location: South America | Capital: Brasília | Population: 215 million | President: Luiz Inácio Lula da Silva | Currency: Real (BRL) | Famous: Amazon, Christ Redeemer | Language: Portuguese | GDP: $2 trillion+",
+                "argentina": "🇦🇷 ARGENTINA: Location: South America | Capital: Buenos Aires | Population: 46 million | President: Javier Milei | Currency: Peso | Famous: Tango, football | Language: Spanish | GDP: $600 billion",
+                "colombia": "🇨🇴 COLOMBIA: Location: South America | Capital: Bogotá | Population: 52 million | President: Gustavo Petro | Currency: Peso | Famous: Coffee, biodiversity | Language: Spanish",
+                "peru": "🇵🇪 PERU: Location: South America | Capital: Lima | Population: 34 million | President: Dina Boluarte | Currency: Sol | Famous: Machu Picchu | Language: Spanish",
+                "venezuela": "🇻🇪 VENEZUELA: Location: South America | Capital: Caracas | Population: 28 million | President: Nicolás Maduro | Currency: Bolívar | Famous: Oil, Angel Falls | Language: Spanish",
+                "chile": "🇨🇱 CHILE: Location: South America | Capital: Santiago | Population: 19 million | President: Gabriel Boric | Currency: Peso | Famous: Patagonia, Atacama | Language: Spanish",
+                "ecuador": "🇪🇨 ECUADOR: Location: South America | Capital: Quito | Population: 18 million | President: Daniel Noboa | Currency: Dollar | Famous: Galápagos Islands | Language: Spanish",
+                "bolivia": "🇧🇴 BOLIVIA: Location: South America | Capital: Sucre (constitutional), La Paz (administrative) | Population: 12 million | President: Luis Arce | Currency: Boliviano | Famous: Salt flats, Amazon | Language: Spanish",
+                "paraguay": "🇵🇾 PARAGUAY: Location: South America | Capital: Asunción | Population: 7.5 million | President: Santiago Peña | Currency: Guaraní | Famous: Jesuit missions | Language: Spanish",
+                "uruguay": "🇺🇾 URUGUAY: Location: South America | Capital: Montevideo | Population: 3.5 million | President: Luis Lacalle Pou | Currency: Peso | Famous: Beaches, safety | Language: Spanish",
+                
+                // Europe
+                "united kingdom": "🇬🇧 UNITED KINGDOM: Location: Western Europe | Capital: London | Population: 68 million | Prime Minister: Keir Starmer | Currency: Pound (£) | Famous: Big Ben, Stonehenge | Language: English | GDP: $3 trillion+",
+                "france": "🇫🇷 FRANCE: Location: Western Europe | Capital: Paris | Population: 68 million | President: Emmanuel Macron | Currency: Euro (€) | Famous: Eiffel Tower, Louvre | Language: French | GDP: $3 trillion+",
+                "germany": "🇩🇪 GERMANY: Location: Central Europe | Capital: Berlin | Population: 84 million | Chancellor: Olaf Scholz | Currency: Euro (€) | Famous: Brandenburg Gate | Language: German | GDP: $4.5 trillion+",
+                "italy": "🇮🇹 ITALY: Location: Southern Europe | Capital: Rome | Population: 59 million | President: Sergio Mattarella | Prime Minister: Giorgia Meloni | Currency: Euro (€) | Famous: Colosseum, Venice | Language: Italian | GDP: $2 trillion+",
+                "spain": "🇪🇸 SPAIN: Location: Southern Europe | Capital: Madrid | Population: 48 million | President: Pedro Sánchez | Currency: Euro (€) | Famous: La Sagrada Familia | Language: Spanish | GDP: $1.5 trillion+",
+                "poland": "🇵🇱 POLAND: Location: Central Europe | Capital: Warsaw | Population: 38 million | President: Andrzej Duda | Prime Minister: Donald Tusk | Currency: Złoty | Famous: Old Town | Language: Polish",
+                "netherlands": "🇳🇱 NETHERLANDS: Location: Western Europe | Capital: Amsterdam | Population: 18 million | Prime Minister: Dick Schoof | Currency: Euro (€) | Famous: Tulips, canals | Language: Dutch",
+                "belgium": "🇧🇪 BELGIUM: Location: Western Europe | Capital: Brussels | Population: 12 million | King: Philippe | Prime Minister: Bart De Wever | Currency: Euro (€) | Famous: Chocolate, waffles | Languages: Dutch, French, German",
+                "sweden": "🇸🇪 SWEDEN: Location: Northern Europe | Capital: Stockholm | Population: 10.5 million | Prime Minister: Ulf Kristersson | Currency: Krona | Famous: IKEA, ABBA | Language: Swedish",
+                "norway": "🇳🇴 NORWAY: Location: Northern Europe | Capital: Oslo | Population: 5.5 million | Prime Minister: Jonas Gahr Støre | Currency: Krone | Famous: Fjords, oil | Language: Norwegian",
+                "denmark": "🇩🇰 DENMARK: Location: Northern Europe | Capital: Copenhagen | Population: 5.9 million | Prime Minister: Mette Frederiksen | Currency: Krone | Famous: Little Mermaid | Language: Danish",
+                "finland": "🇫🇮 FINLAND: Location: Northern Europe | Capital: Helsinki | Population: 5.5 million | President: Alexander Stubb | Prime Minister: Petteri Orpo | Currency: Euro (€) | Famous: Northern Lights | Languages: Finnish, Swedish",
+                "portugal": "🇵🇹 PORTUGAL: Location: Southern Europe | Capital: Lisbon | Population: 10.4 million | President: Marcelo Rebelo de Sousa | Prime Minister: Luís Montenegro | Currency: Euro (€) | Famous: Discoveries | Language: Portuguese",
+                "greece": "🇬🇷 GREECE: Location: Southern Europe | Capital: Athens | Population: 10.4 million | President: Katerina Sakellaropoulou | Prime Minister: Kyriakos Mitsotakis | Currency: Euro (€) | Famous: Parthenon | Language: Greek",
+                "austria": "🇦🇹 AUSTRIA: Location: Central Europe | Capital: Vienna | Population: 9 million | President: Alexander Van der Bellen | Chancellor: Karl Nehammer | Currency: Euro (€) | Famous: Mozart, Alps | Language: German",
+                "switzerland": "🇨🇭 SWITZERLAND: Location: Central Europe | Capital: Bern | Population: 8.8 million | Federal Council | Currency: Franc | Famous: Banks, chocolate | Languages: German, French, Italian, Romansh",
+                "czech republic": "🇨🇿 CZECH REPUBLIC: Location: Central Europe | Capital: Prague | Population: 10.5 million | President: Petr Pavel | Prime Minister: Petr Fiala | Currency: Koruna | Famous: Prague Castle | Language: Czech",
+                "romania": "🇷🇴 ROMANIA: Location: Eastern Europe | Capital: Bucharest | Population: 19 million | President: Klaus Iohannis | Prime Minister: Marcel Ciolacu | Currency: Leu | Famous: Dracula castle | Language: Romanian",
+                "hungary": "🇭🇺 HUNGARY: Location: Central Europe | Capital: Budapest | Population: 9.6 million | President: Katalin Novák | Prime Minister: Viktor Orbán | Currency: Forint | Famous: Thermal baths | Language: Hungarian",
+                "ukraine": "🇺🇦 UKRAINE: Location: Eastern Europe | Capital: Kyiv | Population: 38 million | President: Volodymyr Zelenskyy | Currency: Hryvnia | Famous: Rich culture | Language: Ukrainian",
+                "russia": "🇷🇺 RUSSIA: Location: Eastern Europe/North Asia | Capital: Moscow | Population: 144 million | President: Vladimir Putin | Currency: Ruble | Famous: Red Square, Siberia | Language: Russian | GDP: $2 trillion+",
+                
+                // Asia
+                "china": "🇨🇳 CHINA: Location: East Asia | Capital: Beijing | Population: 1.4 billion | President: Xi Jinping | Currency: Yuan (CNY) | Major cities: Shanghai, Guangzhou | Language: Mandarin | GDP: $18 trillion+",
+                "japan": "🇯🇵 JAPAN: Location: East Asia | Capital: Tokyo | Population: 125 million | Prime Minister: Shigeru Ishiba | Currency: Yen (¥) | Famous: Mt Fuji, technology | Language: Japanese | GDP: $4.5 trillion+",
+                "india": "🇮🇳 INDIA: Location: South Asia | Capital: New Delhi | Population: 1.4 billion | President: Droupadi Murmu | Prime Minister: Narendra Modi | Currency: Rupee (₹) | Famous: Taj Mahal, IT | Languages: Hindi, English | GDP: $3.7 trillion+",
+                "south korea": "🇰🇷 SOUTH KOREA: Location: East Asia | Capital: Seoul | Population: 52 million | President: Yoon Suk-yeol | Currency: Won (₩) | Famous: K-pop, Samsung | Language: Korean | GDP: $1.8 trillion+",
+                "indonesia": "🇮🇩 INDONESIA: Location: Southeast Asia | Capital: Jakarta | Population: 277 million | President: Prabowo Subianto | Currency: Rupiah | Famous: Bali, volcanoes | Language: Indonesian",
+                "thailand": "🇹🇭 THAILAND: Location: Southeast Asia | Capital: Bangkok | Population: 72 million | King: Vajiralongkorn | Prime Minister: Srettha Thavisin | Currency: Baht | Famous: Temples, beaches | Language: Thai",
+                "vietnam": "🇻🇳 VIETNAM: Location: Southeast Asia | Capital: Hanoi | Population: 100 million | President: Lương Cường | Prime Minister: Phạm Minh Chính | Currency: Đồng | Famous: Ha Long Bay | Language: Vietnamese",
+                "philippines": "🇵🇭 PHILIPPINES: Location: Southeast Asia | Capital: Manila | Population: 114 million | President: Bongbong Marcos | Currency: Peso | Famous: Beaches, islands | Languages: Filipino, English",
+                "malaysia": "🇲🇾 MALAYSIA: Location: Southeast Asia | Capital: Kuala Lumpur | Population: 33 million | King: Sultan Abdullah | Prime Minister: Anwar Ibrahim | Currency: Ringgit | Famous: Petronas Towers | Language: Malay",
+                "singapore": "🇸🇬 SINGAPORE: Location: Southeast Asia (City-state) | Capital: Singapore | Population: 6 million | President: Tharman Shanmugaratnam | Prime Minister: Lawrence Wong | Currency: Dollar | Famous: Marina Bay | Languages: English, Malay, Mandarin, Tamil",
+                "pakistan": "🇵🇰 PAKISTAN: Location: South Asia | Capital: Islamabad | Population: 240 million | President: Arif Alvi | Prime Minister: Shehbaz Sharif | Currency: Rupee | Famous: K2, Lahore | Languages: Urdu, English",
+                "bangladesh": "🇧🇩 BANGLADESH: Location: South Asia | Capital: Dhaka | Population: 170 million | President: Mohammed Shahabuddin | Prime Minister: Sheikh Hasina | Currency: Taka | Famous: Rivers, textiles | Language: Bengali",
+                "iran": "🇮🇷 IRAN: Location: Middle East | Capital: Tehran | Population: 89 million | President: Masoud Pezeshkian | Currency: Rial | Famous: Persepolis | Language: Persian",
+                "iraq": "🇮🇶 IRAQ: Location: Middle East | Capital: Baghdad | Population: 43 million | President: Abdul Latif Rashid | Prime Minister: Mohammed Shia Al-Sudani | Currency: Dinar | Famous: Ancient Mesopotamia | Languages: Arabic, Kurdish",
+                "saudi arabia": "🇸🇦 SAUDI ARABIA: Location: Middle East | Capital: Riyadh | Population: 36 million | King: Salman bin Abdulaziz | Crown Prince: Mohammed bin Salman | Currency: Riyal | Famous: Mecca, oil | Language: Arabic",
+                "united arab emirates": "🇦🇪 UAE: Location: Middle East | Capital: Abu Dhabi | Population: 10 million | President: Sheikh Mohamed bin Zayed | Prime Minister: Sheikh Mohammed bin Rashid | Currency: Dirham | Famous: Dubai, skyscrapers | Language: Arabic",
+                "israel": "🇮🇱 ISRAEL: Location: Middle East | Capital: Jerusalem | Population: 9.5 million | President: Isaac Herzog | Prime Minister: Benjamin Netanyahu | Currency: Shekel | Famous: Holy Land | Languages: Hebrew, Arabic",
+                "turkey": "🇹🇷 TURKEY: Location: Middle East/Europe | Capital: Ankara | Population: 85 million | President: Recep Tayyip Erdoğan | Currency: Lira | Famous: Hagia Sophia | Language: Turkish",
+                "qatar": "🇶🇦 QATAR: Location: Middle East | Capital: Doha | Population: 2.8 million | Emir: Sheikh Tamim bin Hamad Al Thani | Currency: Riyal | Famous: Natural gas, World Cup | Language: Arabic",
+                "kuwait": "🇰🇼 KUWAIT: Location: Middle East | Capital: Kuwait City | Population: 4.3 million | Emir: Nawaf Al-Ahmad Al-Jaber | Prime Minister: Ahmad Abdullah Al-Ahmad | Currency: Dinar | Famous: Oil | Language: Arabic",
+                "lebanon": "🇱🇧 LEBANON: Location: Middle East | Capital: Beirut | Population: 5.5 million | President: Joseph Aoun | Prime Minister: Najib Mikati | Currency: Pound | Famous: Cedars, history | Languages: Arabic, French",
+                "jordan": "🇯🇴 JORDAN: Location: Middle East | Capital: Amman | Population: 11 million | King: Abdullah II | Prime Minister: Bisher Khasawneh | Currency: Dinar | Famous: Petra | Language: Arabic",
+                
+                // Oceania
+                "australia": "🇦🇺 AUSTRALIA: Location: Oceania | Capital: Canberra | Population: 26 million | Prime Minister: Anthony Albanese | Currency: Dollar (AUD) | Famous: Great Barrier Reef | Language: English | GDP: $1.7 trillion+",
+                "new zealand": "🇳🇿 NEW ZEALAND: Location: Oceania | Capital: Wellington | Population: 5.2 million | Prime Minister: Christopher Luxon | Currency: Dollar (NZD) | Famous: Hobbiton, Lord of the Rings | Languages: English, Māori",
+                "fiji": "🇫🇯 FIJI: Location: Oceania | Capital: Suva | Population: 900,000 | President: Ratu Wiliame Maivaleru Katonivere | Prime Minister: Sitiveni Rabuka | Currency: Dollar | Famous: Islands | Languages: English, Fijian, Hindi",
+                "papua new guinea": "🇵🇬 PAPUA NEW GUINEA: Location: Oceania | Capital: Port Moresby | Population: 10 million | Prime Minister: James Marape | Currency: Kina | Famous: Tribal culture | Languages: English, Tok Pisin",
+                
+                // Additional countries
+                "north korea": "🇰🇵 NORTH KOREA: Location: East Asia | Capital: Pyongyang | Population: 26 million | Supreme Leader: Kim Jong-un | Currency: Won | Famous: DMZ | Language: Korean",
+                "taiwan": "🇹🇼 TAIWAN: Location: East Asia | Capital: Taipei | Population: 24 million | President: Lai Ching-te | Currency: Dollar | Famous: Tech manufacturing | Language: Mandarin",
+                "afghanistan": "🇦🇫 AFGHANISTAN: Location: South Asia | Capital: Kabul | Population: 43 million | Supreme Leader: Hibatullah Akhundzada | Currency: Afghani | Famous: Hindu Kush mountains | Languages: Pashto, Dari",
+                "myanmar": "🇲🇲 MYANMAR: Location: Southeast Asia | Capital: Naypyidaw | Population: 55 million | President: Min Aung Hlaing | Currency: Kyat | Famous: Temples | Language: Burmese",
+                "sri lanka": "🇱🇰 SRI LANKA: Location: South Asia | Capital: Sri Jayawardenepura Kotte | Population: 22 million | President: Ranil Wickremesinghe | Prime Minister: Dinesh Gunawardena | Currency: Rupee | Famous: Tea, beaches | Languages: Sinhala, Tamil",
+                
                 "what is geography": "Geography is the study of Earth's features, climates, populations, and cultures. Physical geography: landforms, weather, ecosystems. Human geography: cities, politics, economy. It connects natural and social sciences.",
                 "earth layers": "Earth has layers from outside-in: Crust (solid rock, 35 km avg), Mantle (hot rock, 2,900 km), Outer Core (liquid iron), Inner Core (solid iron, 6,371 km total radius). Temperature increases with depth.",
                 "what are tectonic plates": "Tectonic plates are large pieces of Earth's crust/upper mantle that move slowly. 7 major plates + many minor ones. They interact at boundaries causing earthquakes, volcanic eruptions, mountain formation, and trenches.",
@@ -2028,7 +2147,7 @@ Just ask me anything!`;
                     ]
                 },
                
-                
+            
                 'champions league': {
                     title: '🏆 UEFA Champions League',
                     teams: [
@@ -2487,9 +2606,79 @@ Just ask me anything!`;
                     }
                 }
             }
+            
+            // Country information requests - check for country queries
+            const countryKeywords = ['country', 'countries', 'population', 'president of', 'capital of', 'where is', 'location of', 'tell me about', 'info on'];
+            const hasCountryKeyword = countryKeywords.some(kw => lowerQuery.includes(kw));
+            
+            // Try to find country in query
+            const allCountries = ['nigeria','egypt','south africa','kenya','morocco','ethiopia','ghana','tanzania','algeria','tunisia','uganda','sudan','cameroon','ivory coast','madagascar','mozambique','angola','senegal','zimbabwe','rwanda','united states','usa','america','canada','mexico','brazil','argentina','colombia','peru','venezuela','chile','ecuador','bolivia','paraguay','uruguay','united kingdom','uk','france','germany','italy','spain','poland','netherlands','belgium','sweden','norway','denmark','finland','portugal','greece','austria','switzerland','czech republic','romania','hungary','ukraine','russia','china','japan','india','south korea','indonesia','thailand','vietnam','philippines','malaysia','singapore','pakistan','bangladesh','iran','iraq','saudi arabia','united arab emirates','uae','israel','turkey','qatar','kuwait','lebanon','jordan','australia','new zealand','fiji','papua new guinea','north korea','taiwan','afghanistan','myanmar','sri lanka'];
+            
+            let foundCountry = null;
+            for (const country of allCountries) {
+                if (lowerQuery.includes(country)) {
+                    foundCountry = country;
+                    break;
+                }
+            }
+            
+            if (foundCountry || hasCountryKeyword) {
+                // Build a country info response
+                const countryData = {
+                    'united states': '🇺🇸 USA: Location - North America | Capital - Washington D.C. | Population - 335 million | President - Joe Biden | GDP - $26 trillion+ | Major cities: NYC, LA, Chicago | Language: English',
+                    'usa': '🇺🇸 USA: Location - North America | Capital - Washington D.C. | Population - 335 million | President - Joe Biden | GDP - $26 trillion+ | Major cities: NYC, LA, Chicago | Language: English',
+                    'america': '🇺🇸 USA: Location - North America | Capital - Washington D.C. | Population - 335 million | President - Joe Biden | GDP - $26 trillion+ | Major cities: NYC, LA, Chicago | Language: English',
+                    'canada': '🇨🇦 CANADA: Location - North America | Capital - Ottawa | Population - 40 million | Prime Minister - Justin Trudeau | GDP - $2 trillion+ | Major cities: Toronto, Vancouver, Montreal | Languages: English, French',
+                    'mexico': '🇲🇽 MEXICO: Location - North America | Capital - Mexico City | Population - 130 million | President - Claudia Sheinbaum | GDP - $1.5 trillion+ | Language: Spanish',
+                    'brazil': '🇧🇷 BRAZIL: Location - South America | Capital - Brasília | Population - 215 million | President - Luiz Inácio Lula da Silva | GDP - $2 trillion+ | Language: Portuguese',
+                    'argentina': '🇦🇷 ARGENTINA: Location - South America | Capital - Buenos Aires | Population - 46 million | President - Javier Milei | GDP - $600 billion | Language: Spanish',
+                    'united kingdom': '🇬🇧 UK: Location - Western Europe | Capital - London | Population - 68 million | Prime Minister - Keir Starmer | GDP - $3 trillion+ | Language: English',
+                    'uk': '🇬🇧 UK: Location - Western Europe | Capital - London | Population - 68 million | Prime Minister - Keir Starmer | GDP - $3 trillion+ | Language: English',
+                    'france': '🇫🇷 FRANCE: Location - Western Europe | Capital - Paris | Population - 68 million | President - Emmanuel Macron | GDP - $3 trillion+ | Language: French',
+                    'germany': '🇩🇪 GERMANY: Location - Central Europe | Capital - Berlin | Population - 84 million | Chancellor - Olaf Scholz | GDP - $4.5 trillion+ | Language: German',
+                    'italy': '🇮🇹 ITALY: Location - Southern Europe | Capital - Rome | Population - 59 million | President - Sergio Mattarella | GDP - $2 trillion+ | Language: Italian',
+                    'spain': '🇪🇸 SPAIN: Location - Southern Europe | Capital - Madrid | Population - 48 million | President - Pedro Sánchez | GDP - $1.5 trillion+ | Language: Spanish',
+                    'china': '🇨🇳 CHINA: Location - East Asia | Capital - Beijing | Population - 1.4 billion | President - Xi Jinping | GDP - $18 trillion+ | Language: Mandarin',
+                    'japan': '🇯🇵 JAPAN: Location - East Asia | Capital - Tokyo | Population - 125 million | Prime Minister - Shigeru Ishiba | GDP - $4.5 trillion+ | Language: Japanese',
+                    'india': '🇮🇳 INDIA: Location - South Asia | Capital - New Delhi | Population - 1.4 billion | President - Droupadi Murmu | Prime Minister - Narendra Modi | GDP - $3.7 trillion+ | Languages: Hindi, English',
+                    'russia': '🇷🇺 RUSSIA: Location - Eastern Europe/North Asia | Capital - Moscow | Population - 144 million | President - Vladimir Putin | GDP - $2 trillion+ | Language: Russian',
+                    'nigeria': '🇳🇬 NIGERIA: Location - West Africa | Capital - Abuja | Population - 218 million | President - Bola Ahmed Tinubu | Major cities: Lagos, Kano | Language: English',
+                    'egypt': '🇪🇬 EGYPT: Location - North Africa | Capital - Cairo | Population - 110 million | President - Abdel Fattah el-Sisi | Language: Arabic',
+                    'south africa': '🇿🇦 SOUTH AFRICA: Location - Southern Africa | Capital - Pretoria | Population - 60 million | President - Cyril Ramaphosa | Languages: English, Afrikaans',
+                    'kenya': '🇰🇪 KENYA: Location - East Africa | Capital - Nairobi | Population - 55 million | President - William Ruto | Language: Swahili',
+                    'australia': '🇦🇺 AUSTRALIA: Location - Oceania | Capital - Canberra | Population - 26 million | Prime Minister - Anthony Albanese | GDP - $1.7 trillion+ | Language: English',
+                    'indonesia': '🇮🇩 INDONESIA: Location - Southeast Asia | Capital - Jakarta | Population - 277 million | President - Prabowo Subianto | Language: Indonesian',
+                    'south korea': '🇰🇷 SOUTH KOREA: Location - East Asia | Capital - Seoul | Population - 52 million | President - Yoon Suk-yeol | GDP - $1.8 trillion+ | Language: Korean',
+                    'turkey': '🇹🇷 TURKEY: Location - Middle East/Europe | Capital - Ankara | Population - 85 million | President - Recep Tayyip Erdoğan | Language: Turkish',
+                    'saudi arabia': '🇸🇦 SAUDI ARABIA: Location - Middle East | Capital - Riyadh | Population - 36 million | King - Salman | Language: Arabic'
+                };
+                
+                if (foundCountry && countryData[foundCountry.toLowerCase()]) {
+                    return countryData[foundCountry.toLowerCase()];
+                } else if (hasCountryKeyword && !foundCountry) {
+                    return "🌍 I have information about countries worldwide! Ask me about any specific country like 'tell me about USA' or 'what is the population of Nigeria' or 'who is the president of Brazil' and I'll provide details on location, capital, leader, and population.";
+                }
+            }
+            
+            // Settings/API Key questions - open settings modal
+            if (lowerQuery.includes('settings') || lowerQuery.includes('api key') || lowerQuery.includes('configure') || lowerQuery.includes('open settings')) {
+                // Trigger settings modal to open using direct DOM access
+                setTimeout(() => {
+                    const modal = document.getElementById('settingsModal');
+                    const btn = document.getElementById('settingsBtn');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                    if (btn) {
+                        btn.click();
+                    }
+                }, 0);
+                return "⚙️ Opening settings for you! Here you can configure your API key, customize colors, and adjust language preferences. Click the save button when done!";
+            }
 
             // Try Wikipedia for factual topics
             const wikiResult = await searchWikipedia(query);
+            if (wikiResult) return wikiResult;
             if (wikiResult) return wikiResult;
 
             // Try smart AI (includes ChatGPT API if key provided)
